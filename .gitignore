@@ -33,7 +33,7 @@
 
 # CMake
 */build
-*/test
+*/tests
 
 # VSCode
 */.vscode

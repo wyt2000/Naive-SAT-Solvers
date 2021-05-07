@@ -58,7 +58,14 @@ bool Solver::solve(clauses_type clauses, std::set<int> assigns) {
         assignments = assigns;
         return true;
     }
-    int p = *(*clauses.begin()).begin();
+    int nbclauses = clauses.size();
+    int p;
+    for (int i = 1; i <= nbclauses; i++) {
+        if(!assigns.count(i) && !assigns.count(-i)) {
+            p = i;
+            break;
+        }
+    }
     clauses_type positive = clauses;
     clauses_type negative = clauses;
     positive.emplace_back(std::set<int>{p});
