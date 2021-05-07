@@ -1,7 +1,6 @@
 #include <string>
 #include <sstream>
 #include "../include/parser.h"
-
 bool Parser::setClauses(std::istream &input) {
     std::string dummy;
     std::stringstream ss;

@@ -14,3 +14,6 @@ add_executable(NaiveDPLL ${NAIVEDPLLSRC})
 # set c++11 support
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# set GDB symbol
+set(CMAKE_BUILD_TYPE Debug)
