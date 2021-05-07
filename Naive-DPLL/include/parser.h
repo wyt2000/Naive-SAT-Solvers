@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
-using clauses_type = std::set<std::set<int>>;
+using clauses_type = std::vector<std::set<int>>;
 /*  Input Format: DIMACS
 *   The file can start with comments, that is lines begining with the character c. 
 *   Right after the comments, there is the line: p cnf nbvar nbclauses 

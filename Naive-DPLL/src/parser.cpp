@@ -37,7 +37,7 @@ bool Parser::setClauses(std::istream &input) {
             }
             clause.insert(literal);
         }
-        clauses.insert(clause);
+        clauses.emplace_back(clause);
     }
 
     return true;

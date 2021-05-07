@@ -1,4 +1,5 @@
 #include "../include/solver.h"
+#include <iostream>
 
 bool Solver::isContradicted(clauses_type clauses) {
     for (auto clause: clauses) {
@@ -11,6 +12,15 @@ bool Solver::isContradicted(clauses_type clauses) {
     return false;
 }
 
+bool Solver::isEmpty(clauses_type clauses) {
+    for (auto clause: clauses) {
+        if (!clause.empty()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int Solver::getUnitLiteral(clauses_type clauses) {
     for (auto clause: clauses) {
         if (clause.size() == 1) {
@@ -21,21 +31,18 @@ int Solver::getUnitLiteral(clauses_type clauses) {
 }
 
 void Solver::unitResolute(clauses_type &clauses, int literal) {
-    for (auto clause: clauses) {
-        if (clause.count(literal)) {
-            clauses.erase(clause);
+    int nbclauses = clauses.size();
+    for (int i = 0; i < nbclauses; i++) {
+        if (clauses[i].count(literal)) {
+            clauses[i].clear();
         }
-        else if (clause.count(-literal)) {
-            clauses.erase(clause);
-            clause.erase(-literal);
-            if (!clause.empty()) {
-                clauses.insert(clause);
-            }
+        else if (clauses[i].count(-literal)) {
+            clauses[i].erase(-literal);
         }
     }
 }
 
-bool Solver::solve(clauses_type clauses) {
+bool Solver::solve(clauses_type clauses, std::set<int> assigns) {
     if (isContradicted(clauses)) {
         return false;
     }
@@ -44,15 +51,24 @@ bool Solver::solve(clauses_type clauses) {
         if (!unitLiteral) {
             break;
         }
+        assigns.insert(unitLiteral);
         unitResolute(clauses, unitLiteral);
     }
-    if (clauses.empty()) {
+    if (isEmpty(clauses)) {
+        assignments = assigns;
         return true;
     }
     int p = *(*clauses.begin()).begin();
     clauses_type positive = clauses;
     clauses_type negative = clauses;
-    positive.insert(std::set<int>{p});
-    negative.insert(std::set<int>{-p});
-    return solve(positive) || solve(negative);
+    positive.emplace_back(std::set<int>{p});
+    negative.emplace_back(std::set<int>{-p});
+    return solve(positive, assigns) || solve(negative, assigns);
+}
+
+void Solver::printResult() {
+    for(auto assignment: assignments) {
+        std::cout << assignment << ' ';
+    }
+    std::cout << std::endl;
 }
