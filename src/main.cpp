@@ -3,7 +3,7 @@
 #include <cstring>
 #include <string>
 #include "../include/parser.h"
-#include "../include/solver.h"
+#include "../include/dpllsolver.h"
 
 int main(int argc, char **argv) {
     if (argc == 1 || strcmp(argv[1], "-in") || argc != 3) {
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
         return -1;
     }
     Parser parser;
-    Solver solver;
+    DPLLSolver solver;
     if (!parser.setClauses(fin)) {
         std::cout << "Error: invalid input." << std::endl;
         return -1;

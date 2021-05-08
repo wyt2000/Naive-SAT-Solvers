@@ -1,7 +1,7 @@
-#include "../include/solver.h"
+#include "../include/dpllsolver.h"
 #include <iostream>
 
-bool Solver::isEmpty(clauses_type clauses) {
+bool DPLLSolver::isEmpty(clauses_type clauses) {
     for (auto clause: clauses) {
         if (!clause.empty()) {
             return false;
@@ -10,7 +10,7 @@ bool Solver::isEmpty(clauses_type clauses) {
     return true;
 }
 
-int Solver::getUnitLiteral(clauses_type clauses) {
+int DPLLSolver::getUnitLiteral(clauses_type clauses) {
     for (auto clause: clauses) {
         if (clause.size() == 1) {
             return *clause.begin();
@@ -19,7 +19,7 @@ int Solver::getUnitLiteral(clauses_type clauses) {
     return 0;
 }
 
-bool Solver::unitResolute(clauses_type &clauses, int literal) {
+bool DPLLSolver::unitResolute(clauses_type &clauses, int literal) {
     for (auto it = clauses.begin(); it != clauses.end();) {
         if (it->count(literal)) {
             it = clauses.erase(it);
@@ -43,7 +43,7 @@ bool Solver::unitResolute(clauses_type &clauses, int literal) {
     return true;
 }
 
-bool Solver::solve(clauses_type clauses, std::set<int> assigns) {
+bool DPLLSolver::solve(clauses_type clauses, std::set<int> assigns) {
     while (1) {
         int unitLiteral = getUnitLiteral(clauses);
         if (!unitLiteral) {
@@ -66,7 +66,7 @@ bool Solver::solve(clauses_type clauses, std::set<int> assigns) {
     return solve(positive, assigns) || solve(negative, assigns);
 }
 
-void Solver::printResult(std::ostream &output) {
+void DPLLSolver::printResult(std::ostream &output) {
     for(auto assignment: assignments) {
         output << assignment << ' ';
     }

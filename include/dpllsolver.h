@@ -1,12 +1,11 @@
-#ifndef SOLVER_H
-#define SOLVER_H
+#ifndef DPLLSOLVER_H
+#define DPLLSOLVER_H
 #include <set>
 #include <vector>
-#include <stack>
 #include <ostream>
 using clauses_type = std::vector<std::set<int>>;
 
-class Solver {
+class DPLLSolver {
 private:
     std::set<int> assignments;
     bool isEmpty(clauses_type clauses);
