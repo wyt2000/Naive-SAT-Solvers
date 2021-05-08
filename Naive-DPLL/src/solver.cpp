@@ -20,16 +20,24 @@ int Solver::getUnitLiteral(clauses_type clauses) {
 }
 
 bool Solver::unitResolute(clauses_type &clauses, int literal) {
-    int nbclauses = clauses.size();
-    for (int i = 0; i < nbclauses; i++) {
-        if (clauses[i].count(literal)) {
-            clauses[i].clear();
+    for (auto it = clauses.begin(); it != clauses.end();) {
+        if (it->count(literal)) {
+            it = clauses.erase(it);
         }
-        else if (clauses[i].count(-literal)) {
-            if(clauses[i].size() == 1) {
+        else if (it->count(-literal)) {
+            if(it->size() == 1) {
                 return false;
             }
-            clauses[i].erase(-literal);
+            it->erase(-literal);
+            if (it->empty()) {
+                it = clauses.erase(it);
+            }
+            else {
+                it++;
+            }
+        }
+        else {
+            it++;
         }
     }
     return true;
@@ -50,17 +58,7 @@ bool Solver::solve(clauses_type clauses, std::set<int> assigns) {
         assignments = assigns;
         return true;
     }
-    int nbclauses = clauses.size();
-    int p = 0;
-    for (int i = 1; i <= nbclauses; i++) {
-        if(!assigns.count(i) && !assigns.count(-i)) {
-            p = i;
-            break;
-        }
-    }
-    if (!p) {
-        return false;
-    }
+    int p = *(*clauses.begin()).begin();
     clauses_type positive = clauses;
     clauses_type negative = clauses;
     positive.emplace_back(std::set<int>{p});
