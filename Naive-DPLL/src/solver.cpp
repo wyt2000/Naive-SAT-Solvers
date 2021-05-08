@@ -1,17 +1,6 @@
 #include "../include/solver.h"
 #include <iostream>
 
-bool Solver::isContradicted(clauses_type clauses) {
-    for (auto clause: clauses) {
-        for(auto literal: clause) {
-            if(clause.count(-literal)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 bool Solver::isEmpty(clauses_type clauses) {
     for (auto clause: clauses) {
         if (!clause.empty()) {
@@ -30,41 +19,47 @@ int Solver::getUnitLiteral(clauses_type clauses) {
     return 0;
 }
 
-void Solver::unitResolute(clauses_type &clauses, int literal) {
+bool Solver::unitResolute(clauses_type &clauses, int literal) {
     int nbclauses = clauses.size();
     for (int i = 0; i < nbclauses; i++) {
         if (clauses[i].count(literal)) {
             clauses[i].clear();
         }
         else if (clauses[i].count(-literal)) {
+            if(clauses[i].size() == 1) {
+                return false;
+            }
             clauses[i].erase(-literal);
         }
     }
+    return true;
 }
 
 bool Solver::solve(clauses_type clauses, std::set<int> assigns) {
-    if (isContradicted(clauses)) {
-        return false;
-    }
     while (1) {
         int unitLiteral = getUnitLiteral(clauses);
         if (!unitLiteral) {
             break;
         }
         assigns.insert(unitLiteral);
-        unitResolute(clauses, unitLiteral);
+        if (!unitResolute(clauses, unitLiteral)) {
+            return false;
+        }
     }
     if (isEmpty(clauses)) {
         assignments = assigns;
         return true;
     }
     int nbclauses = clauses.size();
-    int p;
+    int p = 0;
     for (int i = 1; i <= nbclauses; i++) {
         if(!assigns.count(i) && !assigns.count(-i)) {
             p = i;
             break;
         }
+    }
+    if (!p) {
+        return false;
     }
     clauses_type positive = clauses;
     clauses_type negative = clauses;
