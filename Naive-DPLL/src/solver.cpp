@@ -66,9 +66,9 @@ bool Solver::solve(clauses_type clauses, std::set<int> assigns) {
     return solve(positive, assigns) || solve(negative, assigns);
 }
 
-void Solver::printResult() {
+void Solver::printResult(std::ostream &output) {
     for(auto assignment: assignments) {
-        std::cout << assignment << ' ';
+        output << assignment << ' ';
     }
-    std::cout << std::endl;
+    output << std::endl;
 }

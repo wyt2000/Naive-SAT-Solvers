@@ -37,3 +37,6 @@
 
 # VSCode
 */.vscode
+
+# tests
+*/test.sh

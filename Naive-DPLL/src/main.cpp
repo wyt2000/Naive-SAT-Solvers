@@ -19,13 +19,15 @@ int main(int argc, char **argv) {
     Solver solver;
     if (!parser.setClauses(fin)) {
         std::cout << "Error: invalid input." << std::endl;
+        return -1;
     }
     if (solver.solve(parser.getClauses(), std::set<int>())) {
         std::cout << "satisfiable" << std::endl;
-        solver.printResult();
+        solver.printResult(std::cout);
+        return 0;
     }
     else {
         std::cout << "unsatisfiable" << std::endl;
+        return 1;
     }
-    return 0;
 }
