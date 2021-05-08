@@ -32,11 +32,11 @@
 *.app
 
 # CMake
-*/build
-*/tests
+build
+tests
 
 # VSCode
-*/.vscode
+.vscode
 
 # tests
-*/test.sh
+test.sh
