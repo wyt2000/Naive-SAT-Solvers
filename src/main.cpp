@@ -4,6 +4,7 @@
 #include <string>
 #include "../include/parser.h"
 #include "../include/dpllsolver.h"
+#include "../include/cdclsolver.h"
 
 int main(int argc, char **argv) {
     if (argc == 1 || strcmp(argv[1], "-in") || argc != 3) {
@@ -16,12 +17,12 @@ int main(int argc, char **argv) {
         return -1;
     }
     Parser parser;
-    DPLLSolver solver;
     if (!parser.setClauses(fin)) {
         std::cout << "Error: invalid input." << std::endl;
         return -1;
     }
-    if (solver.solve(parser.getClauses(), std::set<int>())) {
+    CDCLSolver solver(parser);
+    if (solver.solve()) {
         std::cout << "satisfiable" << std::endl;
         solver.printResult(std::cout);
         return 0;

@@ -20,6 +20,7 @@ public:
     bool setClauses(std::istream &input);
     clauses_type getClauses();
     void showClauses(std::ostream &output);
+    friend class CDCLSolver;
 };
 
 
