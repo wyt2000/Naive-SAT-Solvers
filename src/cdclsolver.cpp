@@ -65,7 +65,7 @@ bool CDCLSolver::backJumping() {
 }
 
 bool CDCLSolver::solve() {
-    assignments.resize(nbvar, UNDEFINED);
+    assignments.resize(nbvar + 1, UNDEFINED);
     for (int i = 1; i <= nbvar; i++) {
         undefinedSet.insert(i);
     }
