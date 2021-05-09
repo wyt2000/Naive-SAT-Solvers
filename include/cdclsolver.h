@@ -31,9 +31,9 @@ private:
     std::set<int> undefinedSet;
     void assign(int literal);
     int unassign();
-    STATE unitPropagate();
+    STATE unitPropagate(std::set<int> &learnedClause);
     bool decide();
-    bool backJumping();
+    bool backJumping(std::set<int> learnedClause);
 public:
     CDCLSolver(Parser parser):
         nbvar(parser.nbvar),

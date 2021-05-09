@@ -1,5 +1,7 @@
 #include "../include/cdclsolver.h"
 #include <iostream>
+#include <map>
+#include <algorithm>
 
 void CDCLSolver::assign(int literal) {
     literalStack.push(literal);
@@ -15,8 +17,8 @@ int CDCLSolver::unassign() {
     return literal;
 }
 
-STATE CDCLSolver::unitPropagate() {
-    STATE state = STABLE;
+STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
+    std::map<int, int> unitMap;
     for (int i = 0; i < nbclauses; i++) {
         int unit = 0;
         std::set<int>::iterator it;
@@ -30,17 +32,40 @@ STATE CDCLSolver::unitPropagate() {
                 break;
             }
         }
-        if (it == clauses[i].end()) {
-            if (unit) {
-                assign(unit);
-                state = UPDATED;
+        if (it == clauses[i].end() && unit) {
+            unitMap.insert({unit, i});
+        }
+    }
+    if(unitMap.empty()) {
+        return STABLE;
+    }
+    else {
+        for (auto tier: unitMap) {
+            int unit, i;
+            std::tie(unit, i) = tier;
+            if (unitMap.find(-unit) != unitMap.end()) {
+                int j = unitMap[-unit];
+                std::set_union(clauses[i].begin(),
+                                      clauses[i].end(),
+                                      clauses[j].begin(),
+                                      clauses[j].end(),
+                                      std::inserter(learnedClause, learnedClause.begin()));
+                learnedClause.erase(unit);
+                learnedClause.erase(-unit);
+                clauses.push_back(learnedClause);
+                if (i > j) {
+                    std::swap(i, j);
+                }
+                auto it = clauses.erase(clauses.begin() + i);
+                clauses.erase(it + j - i - 1);
+                return CONTRADICTED;
             }
             else {
-                state = CONTRADICTED;
+                assign(unit);
             }
         }
     }
-    return state;
+    return UPDATED;
 }
 
 bool CDCLSolver::decide() {
@@ -53,7 +78,7 @@ bool CDCLSolver::decide() {
     return true;
 }
 
-bool CDCLSolver::backJumping() {
+bool CDCLSolver::backJumping(std::set<int> learnedClause) {
     if (decisionStack.empty()) {
         return false;
     }
@@ -70,8 +95,9 @@ bool CDCLSolver::solve() {
         undefinedSet.insert(i);
     }
     while(1) {
-        STATE state = unitPropagate();
-        if (state == CONTRADICTED && !backJumping()) {
+        std::set<int> learnedClause;
+        STATE state = unitPropagate(learnedClause);
+        if (state == CONTRADICTED && !backJumping(learnedClause)) {
             return false;
         }
         else if (state == STABLE && !decide()) {
