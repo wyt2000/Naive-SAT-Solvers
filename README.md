@@ -1,2 +1,2 @@
 # Parallel-SAT-Solver
-SAT solvers in Parallel.
+Boolean satisfiability problem solvers. 

@@ -93,14 +93,6 @@ bool CDCLSolver::decide() {
             else {
                 contradicted++;
             }
-            /*
-            if (value == POSITIVE && *it < 0 || value == NEGATIVE && *it > 0) {
-                contradicted++;
-            }
-            else if (value == POSITIVE && *it < 0 || )
-            else if (value == UNDEFINED) {
-                literal = -*it;
-            }*/
         }
         if (literal && contradicted >= maxContradicted) {
             maxContradicted = contradicted;
