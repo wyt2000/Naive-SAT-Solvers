@@ -23,9 +23,8 @@ enum STATE {
 class CDCLSolver {
 private:
     int nbvar;
-    int nbclauses;
     clauses_type clauses;
-    std::stack<int> literalStack;
+    std::vector<int> literalStack;
     std::stack<int> decisionStack;
     std::vector<VALUE> assignments;
     std::set<int> undefinedSet;
@@ -37,7 +36,6 @@ private:
 public:
     CDCLSolver(Parser parser):
         nbvar(parser.nbvar),
-        nbclauses(parser.nbclauses),
         clauses(parser.clauses){}
     bool solve();
     void printResult(std::ostream &output);

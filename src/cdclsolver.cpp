@@ -4,14 +4,14 @@
 #include <algorithm>
 
 void CDCLSolver::assign(int literal) {
-    literalStack.push(literal);
+    literalStack.push_back(literal);
     assignments[abs(literal)] = (literal > 0) ? POSITIVE : NEGATIVE;
     undefinedSet.erase(abs(literal));
 }
 
 int CDCLSolver::unassign() {
-    int literal = literalStack.top();
-    literalStack.pop();
+    int literal = literalStack.back();
+    literalStack.pop_back();
     assignments[abs(literal)] = UNDEFINED;
     undefinedSet.insert(abs(literal));
     return literal;
@@ -19,6 +19,7 @@ int CDCLSolver::unassign() {
 
 STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
     std::map<int, int> unitMap;
+    int nbclauses = clauses.size();
     for (int i = 0; i < nbclauses; i++) {
         int unit = 0;
         std::set<int>::iterator it;
@@ -32,8 +33,13 @@ STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
                 break;
             }
         }
-        if (it == clauses[i].end() && unit) {
-            unitMap.insert({unit, i});
+        if (it == clauses[i].end()) {
+            if (unit) {
+                unitMap.insert({unit, i});
+            }
+            else {
+                return CONTRADICTED;
+            }
         }
     }
     if(unitMap.empty()) {
@@ -53,11 +59,7 @@ STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
                 learnedClause.erase(unit);
                 learnedClause.erase(-unit);
                 clauses.push_back(learnedClause);
-                if (i > j) {
-                    std::swap(i, j);
-                }
-                auto it = clauses.erase(clauses.begin() + i);
-                clauses.erase(it + j - i - 1);
+                // TODO: Forget redundant clauses
                 return CONTRADICTED;
             }
             else {
@@ -84,7 +86,18 @@ bool CDCLSolver::backJumping(std::set<int> learnedClause) {
     }
     int decision = decisionStack.top();
     decisionStack.pop();
-    while (unassign() != decision);
+    int jumpingPoint = decision;
+    int i;
+    for (i = literalStack.size() - 1; i >= 0; i--) {
+        if (learnedClause.count(-literalStack[i]) && literalStack[i] != decision || decisionStack.empty() || learnedClause.empty()) {
+            break;
+        }
+        if (literalStack[i] == decisionStack.top()) {
+            jumpingPoint = literalStack[i];
+            decisionStack.pop();
+        }
+    }
+    while (unassign() != jumpingPoint);
     assign(-decision);
     return true;
 }

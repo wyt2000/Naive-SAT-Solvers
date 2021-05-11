@@ -50,6 +50,7 @@ clauses_type Parser::getClauses() {
 void Parser::showClauses(std::ostream &output) {
     output << "=========== show clauses begin ===========" <<  std::endl;
     output << "nbvar: " << nbvar << "," << "nbclauses: " << nbclauses << std::endl;
+    
     for (auto clause: clauses) {
         for (auto literal: clause) {
             output << literal << ' ';
