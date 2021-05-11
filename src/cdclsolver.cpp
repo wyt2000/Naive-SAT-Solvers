@@ -74,9 +74,46 @@ bool CDCLSolver::decide() {
     if (undefinedSet.empty()) {
         return false;
     }
-    int literal = *undefinedSet.begin();
-    assign(literal);
-    decisionStack.push(literal);
+    int nbclauses = clauses.size();
+    int maxContradicted = 0;
+    int maxLiteral = 0;
+    for (int i = 0; i < nbclauses; i++) {
+        std::set<int>::iterator it;
+        int contradicted = 0;
+        int literal = 0;
+        for (it = clauses[i].begin(); it != clauses[i].end(); it++) {
+            VALUE value = assignments[abs(*it)];
+            if (value == POSITIVE && *it > 0 || value == NEGATIVE && *it < 0) {
+                literal = 0;
+                break;
+            }
+            else if (value == UNDEFINED) {
+                literal = - *it;
+            }
+            else {
+                contradicted++;
+            }
+            /*
+            if (value == POSITIVE && *it < 0 || value == NEGATIVE && *it > 0) {
+                contradicted++;
+            }
+            else if (value == POSITIVE && *it < 0 || )
+            else if (value == UNDEFINED) {
+                literal = -*it;
+            }*/
+        }
+        if (literal && contradicted >= maxContradicted) {
+            maxContradicted = contradicted;
+            maxLiteral = literal;
+        }
+    }
+    if (maxLiteral) {
+        assign(maxLiteral);
+    }
+    else {
+        assign(*undefinedSet.begin());
+    }
+    decisionStack.push(maxLiteral);
     return true;
 }
 
