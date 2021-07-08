@@ -59,6 +59,9 @@ STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
                 learnedClause.erase(unit);
                 learnedClause.erase(-unit);
                 clauses.push_back(learnedClause);
+                for (auto literal: learnedClause) {
+                    frequency[literal]++;
+                }
                 // TODO: Forget redundant clauses
                 return CONTRADICTED;
             }
@@ -74,28 +77,11 @@ bool CDCLSolver::decide() {
     if (undefinedSet.empty()) {
         return false;
     }
-    int nbclauses = clauses.size();
-    int maxContradicted = 0;
-    int maxLiteral = 0;
-    for (int i = 0; i < nbclauses; i++) {
-        std::set<int>::iterator it;
-        int contradicted = 0;
-        int literal = 0;
-        for (it = clauses[i].begin(); it != clauses[i].end(); it++) {
-            VALUE value = assignments[abs(*it)];
-            if (value == POSITIVE && *it > 0 || value == NEGATIVE && *it < 0) {
-                literal = 0;
-                break;
-            }
-            else if (value == UNDEFINED) {
-                literal = - *it;
-            }
-            else {
-                contradicted++;
-            }
-        }
-        if (literal && contradicted >= maxContradicted) {
-            maxContradicted = contradicted;
+    int literal, freq, maxLiteral = 0, maxFreq = -1;
+    for (auto tier: frequency) {
+        std::tie(literal, freq) = tier;
+        if (assignments[abs(literal)] == UNDEFINED && freq > maxFreq) {
+            maxFreq = freq;
             maxLiteral = literal;
         }
     }
@@ -135,6 +121,17 @@ bool CDCLSolver::solve() {
     assignments.resize(nbvar + 1, UNDEFINED);
     for (int i = 1; i <= nbvar; i++) {
         undefinedSet.insert(i);
+    }
+    int nbclauses = clauses.size();
+    for (int i = 0; i < nbclauses; i++) {
+        for (auto literal: clauses[i]) {
+            if (!frequency.count(literal)) {
+                frequency.insert({literal, 0});
+            }
+            else {
+                frequency[literal]++;
+            }
+        }
     }
     while(1) {
         std::set<int> learnedClause;

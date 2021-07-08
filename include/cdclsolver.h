@@ -5,6 +5,7 @@
 #include <set>
 #include <stack>
 #include <ostream>
+#include <map>
 #include "../include/parser.h"
 using clauses_type = std::vector<std::set<int>>;
 
@@ -28,6 +29,7 @@ private:
     std::stack<int> decisionStack;
     std::vector<VALUE> assignments;
     std::set<int> undefinedSet;
+    std::map<int, int> frequency;
     void assign(int literal);
     int unassign();
     STATE unitPropagate(std::set<int> &learnedClause);
