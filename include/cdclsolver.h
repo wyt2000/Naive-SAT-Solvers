@@ -32,7 +32,7 @@ private:
     int unassign();
     STATE unitPropagate(std::set<int> &learnedClause);
     bool decide();
-    bool backJumping(std::set<int> learnedClause);
+    bool backJump(std::set<int> learnedClause);
 public:
     CDCLSolver(Parser parser):
         nbvar(parser.nbvar),

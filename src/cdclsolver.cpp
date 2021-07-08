@@ -109,7 +109,7 @@ bool CDCLSolver::decide() {
     return true;
 }
 
-bool CDCLSolver::backJumping(std::set<int> learnedClause) {
+bool CDCLSolver::backJump(std::set<int> learnedClause) {
     if (decisionStack.empty()) {
         return false;
     }
@@ -139,7 +139,7 @@ bool CDCLSolver::solve() {
     while(1) {
         std::set<int> learnedClause;
         STATE state = unitPropagate(learnedClause);
-        if (state == CONTRADICTED && !backJumping(learnedClause)) {
+        if (state == CONTRADICTED && !backJump(learnedClause)) {
             return false;
         }
         else if (state == STABLE && !decide()) {
