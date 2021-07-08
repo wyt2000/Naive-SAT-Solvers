@@ -29,7 +29,7 @@ private:
     std::stack<int> decisionStack;
     std::vector<VALUE> assignments;
     std::set<int> undefinedSet;
-    std::map<int, int> frequency;
+    int backJumpingTimes;
     void assign(int literal);
     int unassign();
     STATE unitPropagate(std::set<int> &learnedClause);

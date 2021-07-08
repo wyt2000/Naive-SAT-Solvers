@@ -2,6 +2,22 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <iterator>
+#include <random>
+
+template<typename Iter, typename RandomGenerator>
+Iter select_randomly(Iter start, Iter end, RandomGenerator *g) {
+  std::uniform_int_distribution<> dis(0, std::distance(start, end) - 1);
+  std::advance(start, dis(*g));
+  return start;
+}
+
+template<typename Iter>
+Iter select_randomly(Iter start, Iter end) {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  return select_randomly(start, end, &gen);
+}
 
 void CDCLSolver::assign(int literal) {
     literalStack.push_back(literal);
@@ -59,9 +75,6 @@ STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
                 learnedClause.erase(unit);
                 learnedClause.erase(-unit);
                 clauses.push_back(learnedClause);
-                for (auto literal: learnedClause) {
-                    frequency[literal]++;
-                }
                 // TODO: Forget redundant clauses
                 return CONTRADICTED;
             }
@@ -77,21 +90,9 @@ bool CDCLSolver::decide() {
     if (undefinedSet.empty()) {
         return false;
     }
-    int literal, freq, maxLiteral = 0, maxFreq = -1;
-    for (auto tier: frequency) {
-        std::tie(literal, freq) = tier;
-        if (assignments[abs(literal)] == UNDEFINED && freq > maxFreq) {
-            maxFreq = freq;
-            maxLiteral = literal;
-        }
-    }
-    if (maxLiteral) {
-        assign(maxLiteral);
-    }
-    else {
-        assign(*undefinedSet.begin());
-    }
-    decisionStack.push(maxLiteral);
+    int literal = *select_randomly(undefinedSet.begin(), undefinedSet.end());
+    assign(literal);
+    decisionStack.push(literal);
     return true;
 }
 
@@ -114,6 +115,18 @@ bool CDCLSolver::backJump(std::set<int> learnedClause) {
     }
     while (unassign() != jumpingPoint);
     assign(-decision);
+    if (backJumpingTimes > 10) {
+        backJumpingTimes = 0;
+        while (!decisionStack.empty()) {
+            decisionStack.pop();
+        }
+        while (!literalStack.empty()) {
+            unassign();
+        }
+    }
+    else {
+        backJumpingTimes++;
+    }
     return true;
 }
 
@@ -122,17 +135,7 @@ bool CDCLSolver::solve() {
     for (int i = 1; i <= nbvar; i++) {
         undefinedSet.insert(i);
     }
-    int nbclauses = clauses.size();
-    for (int i = 0; i < nbclauses; i++) {
-        for (auto literal: clauses[i]) {
-            if (!frequency.count(literal)) {
-                frequency.insert({literal, 0});
-            }
-            else {
-                frequency[literal]++;
-            }
-        }
-    }
+    backJumpingTimes = 0;
     while(1) {
         std::set<int> learnedClause;
         STATE state = unitPropagate(learnedClause);
