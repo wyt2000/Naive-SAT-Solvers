@@ -1,22 +1,12 @@
 #include "../include/cdclsolver.h"
 #include <iostream>
-#include <map>
-#include <algorithm>
-#include <iterator>
-#include <random>
 
-template<typename Iter, typename RandomGenerator>
-Iter select_randomly(Iter start, Iter end, RandomGenerator *g) {
-  std::uniform_int_distribution<> dis(0, std::distance(start, end) - 1);
-  std::advance(start, dis(*g));
-  return start;
-}
-
-template<typename Iter>
-Iter select_randomly(Iter start, Iter end) {
-  static std::random_device rd;
-  static std::mt19937 gen(rd());
-  return select_randomly(start, end, &gen);
+iter_type CDCLSolver::randomlySelect(iter_type begin, iter_type end) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, std::distance(begin, end) - 1);
+    std::advance(begin, dis(gen));
+    return begin;
 }
 
 void CDCLSolver::assign(int literal) {
@@ -90,7 +80,7 @@ bool CDCLSolver::decide() {
     if (undefinedSet.empty()) {
         return false;
     }
-    int literal = *select_randomly(undefinedSet.begin(), undefinedSet.end());
+    int literal = *randomlySelect(undefinedSet.begin(), undefinedSet.end());
     assign(literal);
     decisionStack.push(literal);
     return true;
@@ -103,9 +93,9 @@ bool CDCLSolver::backJump(std::set<int> learnedClause) {
     int decision = decisionStack.top();
     decisionStack.pop();
     int jumpingPoint = decision;
-    int i;
-    for (i = literalStack.size() - 1; i >= 0; i--) {
-        if (learnedClause.count(-literalStack[i]) && literalStack[i] != decision || decisionStack.empty() || learnedClause.empty()) {
+    for (int i = literalStack.size() - 1; i >= 0; i--) {
+        if (learnedClause.count(-literalStack[i]) && literalStack[i] != decision
+            || decisionStack.empty() || learnedClause.empty()) {
             break;
         }
         if (literalStack[i] == decisionStack.top()) {
