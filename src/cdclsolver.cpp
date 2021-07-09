@@ -23,6 +23,18 @@ int CDCLSolver::unassign() {
     return literal;
 }
 
+std::set<int> CDCLSolver::learn(int unit, int i, int j) {
+    std::set<int> learnedClause;
+    std::set_union(clauses[i].begin(),
+                   clauses[i].end(),
+                   clauses[j].begin(),
+                   clauses[j].end(),
+                   std::inserter(learnedClause, learnedClause.begin()));
+    learnedClause.erase(unit);
+    learnedClause.erase(-unit);
+    return learnedClause;
+}
+
 STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
     std::map<int, int> unitMap;
     int nbclauses = clauses.size();
@@ -57,13 +69,7 @@ STATE CDCLSolver::unitPropagate(std::set<int> &learnedClause) {
             std::tie(unit, i) = tier;
             if (unitMap.find(-unit) != unitMap.end()) {
                 int j = unitMap[-unit];
-                std::set_union(clauses[i].begin(),
-                                      clauses[i].end(),
-                                      clauses[j].begin(),
-                                      clauses[j].end(),
-                                      std::inserter(learnedClause, learnedClause.begin()));
-                learnedClause.erase(unit);
-                learnedClause.erase(-unit);
+                learnedClause = learn(unit, i, j);
                 clauses.push_back(learnedClause);
                 // TODO: Forget redundant clauses
                 return CONTRADICTED;
@@ -86,6 +92,17 @@ bool CDCLSolver::decide() {
     return true;
 }
 
+void CDCLSolver::restart() {
+    backJumpingTimes = 0;
+    maxBackJumpingTimes++;
+    while (!decisionStack.empty()) {
+        decisionStack.pop();
+    }
+    while (!literalStack.empty()) {
+        unassign();
+    }
+}
+
 bool CDCLSolver::backJump(std::set<int> learnedClause) {
     if (decisionStack.empty()) {
         return false;
@@ -105,14 +122,8 @@ bool CDCLSolver::backJump(std::set<int> learnedClause) {
     }
     while (unassign() != jumpingPoint);
     assign(-decision);
-    if (backJumpingTimes > 10) {
-        backJumpingTimes = 0;
-        while (!decisionStack.empty()) {
-            decisionStack.pop();
-        }
-        while (!literalStack.empty()) {
-            unassign();
-        }
+    if (backJumpingTimes > maxBackJumpingTimes) {
+        restart();
     }
     else {
         backJumpingTimes++;
@@ -125,7 +136,6 @@ bool CDCLSolver::solve() {
     for (int i = 1; i <= nbvar; i++) {
         undefinedSet.insert(i);
     }
-    backJumpingTimes = 0;
     while(1) {
         std::set<int> learnedClause;
         STATE state = unitPropagate(learnedClause);

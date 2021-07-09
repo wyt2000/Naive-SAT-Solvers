@@ -72,9 +72,14 @@ private:
     std::set<int> undefinedSet;
 
     /**
+     * The max times to restart.
+     */
+    int maxBackJumpingTimes = 10;
+
+    /**
      * The times jumping back to an early decision.
      */
-    int backJumpingTimes;
+    int backJumpingTimes = 0;
 
     /**
      * Select randomly in undefinedSet.
@@ -96,6 +101,15 @@ private:
     int unassign();
 
     /**
+     * Learn new clause by contradiction. 
+     * @param unit The variable which will be assigned as opposite values in two different clauses.
+     * @param i One clause.
+     * @param j The other clause.
+     * @return The new clause learned.
+     */
+    std::set<int> learn(int unit, int i, int j);
+
+    /**
      * Find the clauses with contradicted assignments expect one unknown literal.
      * Assign variables and learn new clause.
      * @return Propagation state and new clause learned.
@@ -107,6 +121,11 @@ private:
      * @return False if undefinedSet is empty.
      */
     bool decide();
+
+    /**
+     * Clear literalStack if backJumpingTimes reaches maxBackJumpingTimes
+     */
+    void restart();
 
     /**
      * Jump back to an early decision position according to the learned clauses.
