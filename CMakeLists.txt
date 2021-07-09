@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.16) 
 
 # set the project name 
-project(Parallel-SAT-Solver) 
+project(Naive-SAT-Solvers) 
 
 # add include directory
 include_directories(include)
