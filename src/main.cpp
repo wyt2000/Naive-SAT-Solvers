@@ -7,8 +7,8 @@
 #include "../include/cdclsolver.h"
 
 int main(int argc, char **argv) {
-    if (argc == 1 || strcmp(argv[1], "-in") || argc != 3) {
-        std::cout << "Usage: -in <cnfpath>" << std::endl;
+    if (argc == 1 || strcmp(argv[1], "-in") || (argc != 3 && argc != 5)) {
+        std::cout << "Usage: -in <cnfpath> [-a <algorithm>]" << std::endl;
         return -1;
     }
     std::ifstream fin(argv[2]);
@@ -20,6 +20,24 @@ int main(int argc, char **argv) {
     if (!parser.setClauses(fin)) {
         std::cout << "Error: invalid input." << std::endl;
         return -1;
+    }
+    if (argc == 5) {
+        if (!strcmp(argv[4], "dpll")) {
+            DPLLSolver solver;
+            if (solver.solve(parser.getClauses(), std::set<int>())) {
+                std::cout << "satisfiable" << std::endl;
+                solver.printResult(std::cout);
+                return 0;
+            }
+            else {
+                std::cout << "unsatisfiable" << std::endl;
+                return 1;
+            }
+        }
+        else if (strcmp(argv[4], "cdcl")) {
+            std::cout << "Error: invalid input." << std::endl;
+            return -1;
+        }
     }
     CDCLSolver solver(parser);
     if (solver.solve()) {
