@@ -33,10 +33,6 @@
 
 # CMake
 build
-tests
 
 # VSCode
 .vscode
-
-# tests
-test.sh

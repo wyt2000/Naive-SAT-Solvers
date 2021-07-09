@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv) {
     if (argc == 1 || strcmp(argv[1], "-in") || (argc != 3 && argc != 5)) {
-        std::cout << "Usage: -in <cnfpath> [-a <algorithm>]" << std::endl;
+        std::cout << "Usage: solver -in <cnfpath> [-a <algorithm>]" << std::endl;
         return -1;
     }
     std::ifstream fin(argv[2]);
