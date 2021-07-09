@@ -20,7 +20,7 @@ solver -in <cnfpath> [-a <algorithm>]
 ```
 
 - 输入文件格式为 [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) 。
-- <cnfpath> 为输入文件路径，<algorithm> 为 dpll 或 cdcl，默认为 cdcl 。
+- \<cnfpath\> 为输入文件路径，\<algorithm\> 为 dpll 或 cdcl，默认为 cdcl 。
 
 ## 算法解释
 
