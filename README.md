@@ -28,20 +28,20 @@ solver -in <cnfpath> [-a <algorithm>]
 
 #### unitResolute(clauses, literal)
 
-用文字 literal 对合取范式 clauses 做规约，即假定 literal 为真的情况下对 clauses 进行化简。
+用文字 literal 对合取范式 clauses 做归约，即假定 literal 为真的情况下对 clauses 进行化简。
 
 对于 clauses 的每一个子句：
 
-- 如果该子句仅含 literal 的否定，则规约失败。
+- 如果该子句仅含 literal 的否定，则归约失败。
 
 - 如果该子句含有 literal 的否定和其他文字，则在该子句中删除 literal 的否定。
 - 如果该子句含有 literal，则在合取范式中删除该子句。
 
 #### DPLL(clauses, assignments)
 
-- 不停地选择 clauses 中的只含单个文字的子句，将其加入 assignments。并用此文字对 clauses 做规约，直到找不出只含单个文字的子句。
+- 不停地选择 clauses 中的只含单个文字的子句，将其加入 assignments。并用此文字对 clauses 做归约，直到找不出只含单个文字的子句。
 
-- 如果该过程中规约失败，则此问题无解。
+- 如果该过程中归约失败，则此问题无解。
 - 如果 clauses 为空，则 assignments 即为满足此问题的赋值。
 
 - 否则需要随机选取命题变元 p，分别将 p 和非 p 加入 clauses 后递归调用 DPLL，如果两个递归调用有任何一个有解，则原问题有解。
